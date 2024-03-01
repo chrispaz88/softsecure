@@ -26,6 +26,7 @@
             <table class="table table-bordered salary-table">
                 <thead class="thead-dark">
                     <tr>
+                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Área</th>
                         <th>Valor</th>
@@ -33,14 +34,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for key, value in salary.items %}
+                    {% for salary in salaries %}
                     <tr>
-                        <td>{{ value.name }}</td>
-                        <td>{{ value.area }}</td>
-                        <td class="salary-cell">{{ value.value }}</td>
+                        <td>{{ salary.id }}</td>
+                        <td>{{ salary.name }}</td>
+                        <td>{{ salary.area }}</td>
+                        <td class="salary-cell">{{ salary.value }}</td>
                         <td class="action-cell">
-                            <a href="{% url 'edit_salary' key %}" class="btn btn-secondary btn-sm">Editar</a>
-                            <a href="{% url 'delete_salary' key %}" class="btn btn-danger btn-sm">Borrar</a>
+                            <a href="{% url 'edit_salary' salary.id  %}" class="btn btn-secondary btn-sm">Editar</a>
+                            <a href="{% url 'delete_salary' salary.id  %}" class="btn btn-danger btn-sm">Borrar</a>
                         </td>
                     </tr>
                     {% endfor %}

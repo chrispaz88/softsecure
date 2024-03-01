@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect
 import pyrebase
 from phe import paillier
-import json
+from lightphe import LightPHE
+from rsa.cli import encrypt
+
+keyring = paillier.PaillierPrivateKeyring()
+public_key, private_key = paillier.generate_paillier_keypair()
+
 
 from .forms import SalaryForm
 from .models import Salary
+from .scripts import load_paillier_key_public, load_paillier_key_private
 
 config = {
     "apiKey": "AIzaSyCgXKK7zuHdinSTkmQUw2fM-lCiMFl6M6g",
@@ -21,41 +27,32 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 
-# Carga las claves Paillier
-def load_paillier_keys():
-    # Cargar la clave pública
-    with open('public_key.json', 'r') as public_key_file:
-        public_key_data = json.load(public_key_file)
-        public_key = paillier.PaillierPublicKey(n=int(public_key_data['n']))
 
-    # Cargar la clave privada
-    with open('private_key.json', 'r') as private_key_file:
-        private_key_data = json.load(private_key_file)
-        private_key = paillier.PaillierPrivateKey(public_key=public_key,
-                                                  p=int(private_key_data['p']),
-                                                  q=int(private_key_data['q']))
-    return public_key, private_key
 
 # Create your views here.
 def index(request):
-    salary = db.child("Salaries").get().val()
+
+    salaries = Salary.objects.all().values('id', 'name', 'area', 'value')
     return render(request, 'index.html',
-                  {'salary': salary})
+                  {'salaries': salaries})
 
 def add_salary(request):
-    public_key, private_key = load_paillier_keys()  # Cargar la clave pública para cifrado
+
     if request.method == 'POST':
         form = SalaryForm(request.POST)
         if form.is_valid():
             # Extrae la información del formulario
             name = form.cleaned_data['name']
             area = form.cleaned_data['area']
-            value = float(form.cleaned_data['value'])
+            value = str(form.cleaned_data['value'])
 
             # Cifra el valor del salario
-            encrypted_value = public_key.encrypt(value)
+            encrypted_value = public_key.encrypt(value, precision=2)
 
-            Salary.objects.create(name=name, area=area, value=encrypted_value.ciphertext())
+            # Convertir el ciphertext (que es un gran número entero) a una cadena
+            encrypted_value_str = encrypted_value.ciphertext()
+            print('encrypted_value_str: ', encrypted_value_str)
+            Salary.objects.create(name=name, area=area, value=encrypted_value_str )
 
             return redirect('index')  # Redirige a la misma página
     else:
@@ -64,28 +61,51 @@ def add_salary(request):
 
 
 def edit_salary(request, salary_id):
-    # Obtén el salario específico de Firebase
-    salary = db.child("Salaries").child(salary_id).get().val()
+    salary = Salary.objects.get(id=salary_id)
     # Inicializa el formulario con los datos del salario
     if request.method == 'POST':
         form = SalaryForm(request.POST)
         if form.is_valid():
-            db.child("Salaries").child(salary_id).update({
-                "name": form.cleaned_data['name'],
-                "area": form.cleaned_data['area'],
-                "value": float(form.cleaned_data['value'])
-            })
+            # Extrae la información del formulario
+            name = form.cleaned_data['name']
+            area = form.cleaned_data['area']
+            value = str(form.cleaned_data['value'])
+
+            # Cifra el valor del salario
+            encrypted_value = public_key.encrypt(value, precision=2)
+
+            # Convertir el ciphertext (que es un gran número entero) a una cadena
+            encrypted_value_str = encrypted_value.ciphertext()
+
+            salary.name = name
+            salary.area = area
+            salary.value = encrypted_value_str
+            salary.save()
             return redirect('index')
     else:
-        form = SalaryForm(initial=salary)
+        salary_int = int(salary.value)
+        encrypted_number = paillier.EncryptedNumber(public_key, salary_int, exponent=0)
+
+        initial_data = {
+            'id': salary.id,
+            'name': salary.name,
+            'area': salary.area,
+            'value': int(private_key.decrypt(encrypted_number))
+        }
+        form = SalaryForm(initial=initial_data)
     return render(request, 'edit_salary.html', {'form': form, 'salary_id': salary_id})
 
 
 def delete_salary(request, salary_id):
-    salary_data = db.child("Salaries").child(salary_id).get().val()
+    salary_data = Salary.objects.get(id=salary_id)
+
+    #salary_data = db.child("Salaries").child(salary_id).get().val()
 
     if request.method == 'POST':
-        db.child("Salaries").child(salary_id).remove()
+        # Elimina el salario de la base de datos
+        salary_data.delete()
+
+        #db.child("Salaries").child(salary_id).remove()
         return redirect('index')
 
     return render(request, 'delete_confirm.html', {
@@ -95,7 +115,8 @@ def delete_salary(request, salary_id):
 
 
 def sum_homomophric_encrypted_salaries(request):
-    public_key, private_key = load_paillier_keys()
+    public_key = load_paillier_key_public()  # Cargar la clave pública
+
     salary = db.child("Salaries").get().val()
     total = 0
     for salary_id in salary:
@@ -106,7 +127,8 @@ def sum_homomophric_encrypted_salaries(request):
 
 
 def total_decrypted_salaries(request):
-    public_key, private_key = load_paillier_keys()  # Cargar ambas claves
+    public_key = load_paillier_key_public()  # Cargar la clave pública
+    private_key = load_paillier_key_private()  # Cargar la clave privada
     salary_records = db.child("Salaries").get().val()  # Obtener todos los registros de salario
 
     # Iniciar el total cifrado como un número cifrado que representa '0'
@@ -114,7 +136,7 @@ def total_decrypted_salaries(request):
 
     # Iterar a través de cada registro de salario, sumar los valores cifrados
     for salary_id, salary_data in salary_records.items():
-        print('salary_data', salary_data)
+        print( salary_data)
 
         #print('dencripted', dencripted_salary)
         #total_encrypted += encrypted_salary  # Realizar la suma homomórfica
