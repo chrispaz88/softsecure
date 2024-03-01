@@ -4,7 +4,7 @@ from .models import Salary
 
 
 class SalaryForm(forms.ModelForm):
-    value =  forms.CharField(label='Salario', widget=forms.TextInput(attrs={'type': 'number'}))
+    value = forms.CharField(label='Salario', widget=forms.TextInput(attrs={'type': 'number'}))
     class Meta:
         model = Salary
         fields = ['name', 'value', 'area']

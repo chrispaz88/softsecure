@@ -63,17 +63,18 @@ def edit_salary(request, salary_id):
             # Extrae la información del formulario
             name = form.cleaned_data['name']
             area = form.cleaned_data['area']
-            value = str(form.cleaned_data['value'])
+            value = form.cleaned_data['value']
+            #value = str(form.cleaned_data['value'])
 
             # Cifra el valor del salario
-            encrypted_value = public_key.encrypt(value, precision=2)
+            #encrypted_value = public_key.encrypt(value, precision=2)
 
             # Convertir el ciphertext (que es un gran número entero) a una cadena
-            encrypted_value_str = encrypted_value.ciphertext()
+            #encrypted_value_str = encrypted_value.ciphertext()
 
             salary.name = name
             salary.area = area
-            salary.value = encrypted_value_str
+            salary.value = value
             salary.save()
             return redirect('index')
     else:
