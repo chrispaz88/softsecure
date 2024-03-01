@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect
 import pyrebase
 from phe import paillier
+from lightphe import LightPHE
 
 keyring = paillier.PaillierPrivateKeyring()
-public_key, private_key = paillier.generate_paillier_keypair()
+public_key, private_key = paillier.generate_paillier_keypair(n_length=20)
+print('public_key: ', public_key)
+cs = LightPHE(algorithm_name='Paillier', key_size=1024, precision=4)
+LightPHE.export_keys(cs,target_file='../keys.txt')
 
 
-from .forms import SalaryForm
+
+
+from .forms import SalaryForm, SalaryFormCreate
 from .models import Salary
 from .scripts import load_paillier_key_public, load_paillier_key_private
 
@@ -33,24 +39,26 @@ def index(request):
 def add_salary(request):
 
     if request.method == 'POST':
-        form = SalaryForm(request.POST)
+        form = SalaryFormCreate(request.POST)
         if form.is_valid():
             # Extrae la información del formulario
             name = form.cleaned_data['name']
             area = form.cleaned_data['area']
-            value = str(form.cleaned_data['value'])
+            value = int(form.cleaned_data['value'])
+
+            encrypted = cs.encrypt(value)
 
             # Cifra el valor del salario
-            encrypted_value = public_key.encrypt(value, precision=2)
+            #encrypted_value = public_key.encrypt(value, precision=2)
 
             # Convertir el ciphertext (que es un gran número entero) a una cadena
-            encrypted_value_str = encrypted_value.ciphertext()
-            print('encrypted_value_str: ', encrypted_value_str)
-            Salary.objects.create(name=name, area=area, value=encrypted_value_str )
+            #encrypted_value_str = encrypted_value.ciphertext()
+            #print('encrypted_value_str: ', encrypted_value_str)
+            Salary.objects.create(name=name, area=area, value=encrypted.value)
 
             return redirect('index')  # Redirige a la misma página
     else:
-        form = SalaryForm()
+        form = SalaryFormCreate()
     return render(request, 'add_salary.html', {'form': form})
 
 
@@ -74,18 +82,22 @@ def edit_salary(request, salary_id):
 
             salary.name = name
             salary.area = area
-            salary.value = value
+            #salary.value = value
             salary.save()
             return redirect('index')
     else:
         salary_int = int(salary.value)
-        encrypted_number = paillier.EncryptedNumber(public_key, salary_int, exponent=0)
+        cs.restore_keys('../keys.txt')
+        salary_new = cs.create_ciphertext_obj(salary_int)
+        salary_decrypted = cs.decrypt(salary_new)
+
+        #encrypted_number = paillier.EncryptedNumber(public_key, salary_int, exponent=0)
 
         initial_data = {
             'id': salary.id,
             'name': salary.name,
             'area': salary.area,
-            'value': int(private_key.decrypt(encrypted_number))
+            'value': salary_decrypted
         }
         form = SalaryForm(initial=initial_data)
     return render(request, 'edit_salary.html', {'form': form, 'salary_id': salary_id})
@@ -106,21 +118,26 @@ def delete_salary(request, salary_id):
         'salary_data': salary_data
     })
 
+def sum_homomophric_encrypted_salaries_total(request):
+    salaries = Salary.objects.all().values('value')
+    total_salaries = cs.create_ciphertext_obj(0)
+    for salary in salaries:
+        salary_int = int(salary['value'])
+        cs.restore_keys('../keys.txt')
+        salary_new = cs.create_ciphertext_obj(salary_int)
+        obj_dencrypted = cs.decrypt(salary_new)
+        print('obj_dencrypted: ', obj_dencrypted)
+        encrypted = cs.encrypt(obj_dencrypted)
+
+        total_salaries += encrypted
+    dencrypted_total_salaries = cs.decrypt(total_salaries)
+    return dencrypted_total_salaries
+
 
 def sum_homomophric_encrypted_salaries(request):
-    salaries = Salary.objects.all()
-    print(salaries)
-    total = 0
-    for salary in salaries:
-        encrypted_value = int(salary.value)
-        print(encrypted_value)
-        encrypted_number = paillier.EncryptedNumber(public_key, encrypted_value, exponent=0)
-        total += encrypted_number
+    total_salaries = sum_homomophric_encrypted_salaries_total(request)
+    print('total_salaries: ', total_salaries)
+    return render(request, 'total_salaries.html', {'total_salaries': total_salaries})
 
-    # Desencripta el valor total
-
-    #total = int(private_key.decrypt(total))
-
-    return render(request, 'total_salaries.html', {'total_encrypted': total})
 
 
