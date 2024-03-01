@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect
 import pyrebase
 from phe import paillier
-from lightphe import LightPHE
-from rsa.cli import encrypt
 
 keyring = paillier.PaillierPrivateKeyring()
 public_key, private_key = paillier.generate_paillier_keypair()
