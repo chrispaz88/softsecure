@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     'salaries',
     'crispy_forms',
     'pyrebase',
-    'crispy_bootstrap4',
-
+    'crispy_bootstrap4'
 ]
 
 MIDDLEWARE = [
