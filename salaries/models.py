@@ -9,11 +9,7 @@ class Salary(models.Model):
     area = models.CharField(max_length=100)  # Asumiendo que 'Area' es una cadena
     value = models.TextField()
 
- 
 
-
-
-class EncryptedSalary(models.Model):
-    name = models.CharField(max_length=100)
-    encrypted_value = models.TextField()
+class TotalSalariesByArea(models.Model):
     area = models.CharField(max_length=100)
+    total = models.TextField()
