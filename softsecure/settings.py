@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='your_secret_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'softsecure.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'softsecure.onrender.com', '*']
 
 RENDER_EXTERNAL_HOST = os.environ.get('RENDER_EXTERNAL_HOST')
 if RENDER_EXTERNAL_HOST:
