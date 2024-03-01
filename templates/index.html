@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Salarios</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .salary-cell {
+            max-width: 300px;
+            overflow-x: auto;
+        }
+        .action-cell {
+            white-space: nowrap;
+            max-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}
+    <div class="container mt-4">
+        <h1>Base de Datos</h1>
+        <p>Esta es la página principal de la aplicación web.</p>
+        <a href="{% url 'add_salary' %}" class="btn btn-primary mb-3">Nuevo Salario</a>
+        <h2>Salarios</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered salary-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Área</th>
+                        <th>Valor</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in salary.items %}
+                    <tr>
+                        <td>{{ value.name }}</td>
+                        <td>{{ value.area }}</td>
+                        <td class="salary-cell">{{ value.value }}</td>
+                        <td class="action-cell">
+                            <a href="{% url 'edit_salary' key %}" class="btn btn-secondary btn-sm">Editar</a>
+                            <a href="{% url 'delete_salary' key %}" class="btn btn-danger btn-sm">Borrar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>

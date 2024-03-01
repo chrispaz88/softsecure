@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Salario</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    {% load crispy_forms_tags %}
+    {% block content %}
+    <div class="container mt-5">
+        <h2>Editar Salario</h2>
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-success">Actualizar</button>
+        </form>
+    </div>
+    {% endblock %}
+</body>
+</html>

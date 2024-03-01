@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Total de Salarios Cifrados</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Total de Salarios (Cifrado)</h2>
+        <p>El total cifrado de todos los salarios es: <strong>{{ total_encrypted }}</strong></p>
+        <!-- Proporciona una advertencia o explicación de que el valor está cifrado -->
+        <p class="text-warning">Nota: El valor mostrado está cifrado y no representa un número real hasta que se descifre.</p>
+        <p>El total decifrado de todos los salarios es: <strong>{{ total_decrypted }}</strong></p>
+        <a href="{% url 'index' %}" class="btn btn-primary">Volver a la página principal</a>
+    </div>
+</body>
+</html>
