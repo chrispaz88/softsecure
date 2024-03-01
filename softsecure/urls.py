@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ..salaries import views
+
+
+from softsecure.salaries import views
+
 
 urlpatterns = [
     path("", views.index, name="index"),
