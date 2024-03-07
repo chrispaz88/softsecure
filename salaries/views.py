@@ -45,6 +45,7 @@ def add_salary(request):
             name = form.cleaned_data['name']
             area = form.cleaned_data['area']
             value = int(form.cleaned_data['value'])
+            ci = int(form.cleaned_data['ci'])
 
             encrypted = cs.encrypt(value)
 
@@ -54,7 +55,7 @@ def add_salary(request):
             # Convertir el ciphertext (que es un gran número entero) a una cadena
             #encrypted_value_str = encrypted_value.ciphertext()
             #print('encrypted_value_str: ', encrypted_value_str)
-            Salary.objects.create(name=name, area=area, value=encrypted.value)
+            Salary.objects.create(name=name, area=area, value=encrypted.value, ci=ci)
 
             return redirect('index')  # Redirige a la misma página
     else:
@@ -72,6 +73,7 @@ def edit_salary(request, salary_id):
             name = form.cleaned_data['name']
             area = form.cleaned_data['area']
             value = form.cleaned_data['value']
+            ci = form.cleaned_data['ci']
             #value = str(form.cleaned_data['value'])
 
             # Cifra el valor del salario
@@ -83,6 +85,7 @@ def edit_salary(request, salary_id):
             salary.name = name
             salary.area = area
             #salary.value = value
+            salary.ci = ci
             salary.save()
             return redirect('index')
     else:

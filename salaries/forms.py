@@ -5,9 +5,10 @@ from .models import Salary
 
 class SalaryForm(forms.ModelForm):
     value = forms.CharField(label='Salario', widget=forms.TextInput(attrs={'type': 'number'}), disabled=True)
+    ci = forms.CharField(label='CI', widget=forms.TextInput(attrs={'type': 'number'}))
     class Meta:
         model = Salary
-        fields = ['name', 'value', 'area']
+        fields = ['name', 'value', 'area', 'ci']
         widgets = {
             'area': forms.Select(choices=[
                 ('IT', 'IT'),
@@ -20,9 +21,10 @@ class SalaryForm(forms.ModelForm):
 
 class SalaryFormCreate(forms.ModelForm):
     value = forms.CharField(label='Salario', widget=forms.TextInput(attrs={'type': 'number'}))
+    ci = forms.CharField(label='CI', widget=forms.TextInput(attrs={'type': 'number'}))
     class Meta:
         model = Salary
-        fields = ['name', 'area']
+        fields = ['name', 'value','area','ci']
         widgets = {
             'area': forms.Select(choices=[
                 ('IT', 'IT'),
