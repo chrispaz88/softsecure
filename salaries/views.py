@@ -9,7 +9,7 @@ keyring = paillier.PaillierPrivateKeyring()
 
 cs = LightPHE(algorithm_name='Paillier', key_size=1024, precision=4)
 
-LightPHE.restore_keys(cs, '../keys.txt')
+LightPHE.restore_keys(cs, '/keys.txt')
 
 
 
