@@ -1,0 +1,42 @@
+<!-- templates/registration/logout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Asegúrate de incluir la última versión de Bootstrap para un mejor diseño -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Cierre de Sesión Exitoso</title>
+    <style>
+        .logout-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #666;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container bg-light">
+        <h1>¡Cierre de Sesión Exitoso!</h1>
+        <p>Has cerrado sesión correctamente. ¡Esperamos verte de nuevo pronto!</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+    </div>
+    <!-- Opcional: incluye jQuery y JavaScript de Bootstrap para funcionalidades adicionales -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
