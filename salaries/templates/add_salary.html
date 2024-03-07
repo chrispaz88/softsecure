@@ -1,22 +1,88 @@
-<!DOCTYPE html>
-
-<html lang="en">
+{% extends 'base.html' %}
+{% block content %}
 <head>
-    <meta charset="UTF-8">
-    <title>Agregar Salario</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        .form-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        .submit-btn {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     {% load crispy_forms_tags %}
-    {% block content %}
+
     <div class="container mt-5">
-        <h2>Ingresar Salario</h2>
-        <form method="post" class="mt-3">
+        <div class="form-container">
+            <h2>Ingresar Salario</h2>
+            <form method="post" class="mt-3 needs-validation" novalidate>
                 {% csrf_token %}
                 {{ form|crispy }}
-                <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
+                <div class="invalid-feedback d-block">
+                    {{ form.id_value.errors.as_text }}
+                </div>
+                <div class="invalid-feedback d-block">
+                    {{ form.id_ci.errors.as_text }}
+                </div>
+                <button type="submit" class="btn btn-primary submit-btn">Guardar</button>
+            </form>
+        </div>
     </div>
-    {% endblock %}
+
+   <script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                var salaryInput = document.querySelector('#id_value'); // Asegúrate de que este es el ID correcto
+                var ciInput = document.querySelector('#id_ci'); // Asegúrate de que este es el ID correcto
+
+                form.addEventListener('submit', function(event) {
+                    var isFormValid = true;
+
+                    // Validación personalizada para el salario
+                    if (salaryInput) { // Verifica si el elemento existe
+                        if (salaryInput.value && parseInt(salaryInput.value, 10) < 1) {
+                            salaryInput.setCustomValidity('El salario debe ser mayor o igual a 1.');
+                            salaryInput.classList.add('is-invalid');
+                            isFormValid = false;
+                        } else {
+                            salaryInput.setCustomValidity('');
+                            salaryInput.classList.remove('is-invalid');
+                        }
+                    }
+
+                    // Validación personalizada para la cédula
+                    if (ciInput) { // Verifica si el elemento existe
+                        if (ciInput.value && ciInput.value.length !== 10) {
+                            ciInput.setCustomValidity('La cédula debe tener 10 dígitos.');
+                            ciInput.classList.add('is-invalid');
+                            isFormValid = false;
+                        } else {
+                            ciInput.setCustomValidity('');
+                            ciInput.classList.remove('is-invalid');
+                        }
+                    }
+
+                    if (!form.checkValidity() || !isFormValid) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    </script>
+
+
 </body>
-</html>
+{% endblock %}

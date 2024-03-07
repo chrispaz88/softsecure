@@ -1,56 +1,102 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Lista de Salarios</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
+        body {
+            background-image:  /* Nuevo fondo de ciudad nocturna */
+            background-size: cover;
+            background-attachment: fixed;
+        }
         .salary-cell {
-            max-width: 300px;
-            overflow-x: auto;
+            max-width: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .salary-cell:hover {
+            overflow: visible;
+            white-space: normal;
+
+            position: absolute;
+            z-index: 1;
         }
         .action-cell {
+            max-width: 30px;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 100px;
+        }
+        .header, .footer {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            margin-top: 20px;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Bienvenidos a la Base de Datos de Salarios</h1>
+    </div>
+
     {% block content %}
     <div class="container mt-4">
-        <h1>Base de Datos</h1>
-        <p>Esta es la página principal de la aplicación web.</p>
-        <a href="{% url 'add_salary' %}" class="btn btn-primary mb-3">Nuevo Salario</a>
-        <a href="{% url 'total_salaries' %}" class="btn btn-primary mb-3">Suma Total</a>
-        <h2>Salarios</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered salary-table">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Área</th>
-                        <th>Valor</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for salary in salaries %}
-                    <tr>
-                        <td>{{ salary.id }}</td>
-                        <td>{{ salary.name }}</td>
-                        <td>{{ salary.area }}</td>
-                        <td class="salary-cell">{{ salary.value }}</td>
-                        <td class="action-cell">
-                            <a href="{% url 'edit_salary' salary.id  %}" class="btn btn-secondary btn-sm">Editar</a>
-                            <a href="{% url 'delete_salary' salary.id  %}" class="btn btn-danger btn-sm">Borrar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn btn-secondary mb-3"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+            <a href="{% url 'add_salary' %}" class="btn btn-primary mb-3"><i class="fas fa-plus"></i> Nuevo Salario</a>
+            <a href="{% url 'total_salaries' %}" class="btn btn-info mb-3"><i class="fas fa-calculator"></i> Suma Total</a>
+            <h2>Salarios</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered salary-table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Área</th>
+                            <th>Salario</th>
+                            <th>Cédula</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for salary in salaries %}
+                        <tr>
+                            <td>{{ salary.id }}</td>
+                            <td>{{ salary.name }}</td>
+                            <td>{{ salary.area }}</td>
+                            <td class="salary-cell">{{ salary.value }}</td>
+                            <td>{{ salary.ci }}</td>
+                            <td class="action-cell">
+                                <a href="{% url 'edit_salary' salary.id %}" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                                <a href="{% url 'delete_salary' salary.id %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Borrar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary mb-3"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>
+        {% endif %}
+
     </div>
     {% endblock %}
+
+    <div class="footer">
+        <p>&copy; 2024 SalaryEc. Todos los derechos reservados.</p>
+    </div>
 </body>
 </html>

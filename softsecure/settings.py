@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'salaries',
     'crispy_forms',
     'pyrebase',
-    'crispy_bootstrap4'
+    'crispy_bootstrap4',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -143,4 +144,5 @@ if not DEBUG:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
+LOGOUT_REDIRECT_URL='logout'
+LOGIN_REDIRECT_URL='index'

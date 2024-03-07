@@ -4,34 +4,62 @@
     <meta charset="UTF-8">
     <title>Eliminar Salario</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .value-cell {
+            max-width: 200px; /* Ajusta según necesidades */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .value-cell:hover {
+            overflow: visible;
+            white-space: normal;
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con transparencia para el hover */
+            position: absolute;
+            z-index: 1;
+        }
+        .confirmation-container {
+            background-color: #f8f9fa; /* Color de fondo suave */
+            border: 1px solid #ddd; /* Borde sutil */
+            padding: 20px;
+            border-radius: 5px; /* Bordes redondeados */
+            box-shadow: 0 2px 4px rgba(0,0,0,.1); /* Sombra sutil */
+            margin-top: 20px;
+        }
+        .btn-danger {
+            margin-right: 10px; /* Espacio entre botones */
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Confirmar Eliminación</h2>
-        <p>¿Estás seguro de que deseas eliminar el siguiente salario?</p>
+        <div class="confirmation-container">
+            <h2>Confirmar Eliminación</h2>
+            <p>¿Estás seguro de que deseas eliminar el siguiente salario?</p>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Área</th>
-                    <th>Valor</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ salary_data.name }}</td>
-                    <td>{{ salary_data.area }}</td>
-                    <td>{{ salary_data.value }}</td>
-                </tr>
-            </tbody>
-        </table>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Área</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ salary_data.name }}</td>
+                        <td>{{ salary_data.area }}</td>
+                        <td class="value-cell">{{ salary_data.value }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Eliminar</button>
-            <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
-        </form>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+                <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
     </div>
 </body>
 </html>

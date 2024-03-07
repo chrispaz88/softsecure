@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
-import pyrebase
 from phe import paillier
 from lightphe import LightPHE
+from django.contrib.auth import logout
+
 
 keyring = paillier.PaillierPrivateKeyring()
-public_key, private_key = paillier.generate_paillier_keypair(n_length=20)
-print('public_key: ', public_key)
+
+
 cs = LightPHE(algorithm_name='Paillier', key_size=1024, precision=4)
-LightPHE.export_keys(cs,target_file='../keys.txt')
+
+LightPHE.restore_keys(cs, '../keys.txt')
 
 
 
@@ -32,7 +34,7 @@ config = {
 # Create your views here.
 def index(request):
 
-    salaries = Salary.objects.all().values('id', 'name', 'area', 'value')
+    salaries = Salary.objects.all().values('id', 'name', 'area', 'value', 'ci')
     return render(request, 'index.html',
                   {'salaries': salaries})
 
@@ -100,7 +102,8 @@ def edit_salary(request, salary_id):
             'id': salary.id,
             'name': salary.name,
             'area': salary.area,
-            'value': salary_decrypted
+            'value': salary_decrypted,
+            'ci': salary.ci
         }
         form = SalaryForm(initial=initial_data)
     return render(request, 'edit_salary.html', {'form': form, 'salary_id': salary_id})
@@ -144,3 +147,9 @@ def sum_homomophric_encrypted_salaries(request):
 
 
 
+def logout_view(request):
+    # Tu lógica de cerrar sesión aquí
+    logout(request)
+
+
+    return render(request, 'registration/logout.html')
