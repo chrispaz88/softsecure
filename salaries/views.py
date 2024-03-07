@@ -98,7 +98,11 @@ def edit_salary(request, salary_id):
             return redirect('index')
     else:
         salary_int = int(salary.value)
-        cs.restore_keys('../keys.txt')
+        try:
+            with open('/softsecure/keys.txt', 'r', encoding='UTF-8') as file:
+                cs.restore_keys(target_file='../keys.txt')
+        except FileNotFoundError:
+            print('El archivo keys.txt no se encontró en la ubicación esperada.')
         salary_new = cs.create_ciphertext_obj(salary_int)
         salary_decrypted = cs.decrypt(salary_new)
 
