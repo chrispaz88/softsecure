@@ -8,8 +8,14 @@ keyring = paillier.PaillierPrivateKeyring()
 
 
 cs = LightPHE(algorithm_name='Paillier', key_size=1024, precision=4)
+try:
+    with open('/softsecure/keys.txt', 'r', encoding='UTF-8') as file:
+        cs.restore_keys(target_file='../keys.txt')
+except FileNotFoundError:
+    print('El archivo keys.txt no se encontró en la ubicación esperada.')
 
-LightPHE.restore_keys(cs, '/keys.txt')
+
+
 
 
 
